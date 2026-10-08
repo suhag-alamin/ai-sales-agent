@@ -12,8 +12,8 @@ from alembic import context
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-config.set_main_option(name="sqlalchemy.url", value=str(
-    get_settings().DATABASE_URL._replace("%", "%%")))
+config.set_main_option(name="sqlalchemy.url", value=get_settings(
+).DATABASE_URL.render_as_string(hide_password=False).replace("%", "%%"))
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -59,9 +59,9 @@ def run_migrations_offline() -> None:
 def do_run_migrations(connection: Connection) -> None:
     schema: str = get_settings().DB_SCHEMA
     connection.execute(text(f'SET search_path TO "{schema}", public'))
-
+    connection.commit()
     context.configure(connection=connection, target_metadata=target_metadata,
-                      version_table_schema=schema, include_schemas=True)
+                      )
 
     with context.begin_transaction():
         context.run_migrations()
