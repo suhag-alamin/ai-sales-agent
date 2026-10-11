@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional, Any
 from decimal import Decimal
 from app.modules.catalog.models import Category
@@ -16,8 +16,8 @@ class ProductBase(BaseModel):
     price: Decimal = Field(..., title="Product Price",
                            gt=0, max_digits=10, decimal_places=2)
     stock: int = Field(..., title="Product Stock", ge=0)
-    warranty_months: int = Field(...,
-                                 title="Warranty Period in Months", ge=0, default=12)
+    warranty_months: int = Field(
+        12, title="Warranty Period in Months", ge=0)
     specs: dict[str, Any] = Field(
         default_factory=dict, title="Product Specifications")
 
@@ -27,6 +27,8 @@ class ProductCreate(ProductBase):
 
 
 class ProductRead(ProductBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: uuid.UUID = Field(..., title="Product ID")
     slug: str = Field(..., title="Product Slug")
     in_stock: bool = Field(..., title="Is Product In Stock")
@@ -60,10 +62,12 @@ class ProductFilters(BaseModel):
     q: str | None = Field(None, title="Search Query",
                           min_length=2, max_length=255)
     category: Category | None = Field(None, title="Product Category")
+    brand: str | None = Field(
+        None, title="Product Brand", min_length=2, max_length=255)
     min_price: Decimal | None = Field(None, title="Minimum Price", gt=0)
     max_price: Decimal | None = Field(None, title="Maximum Price", gt=0)
     in_stock: bool | None = Field(None, title="In Stock Only")
-    sort: SortOption | None = Field(None, title="Sort Option")
+    sort: SortOption = Field(SortOption.NEWEST, title="Sort Option")
     page: int = Field(1, title="Page Number", ge=1)
     page_size: int = Field(10, title="Page Size", ge=1, le=500)
 
