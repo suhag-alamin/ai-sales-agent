@@ -11,7 +11,7 @@ class Category(str, enum.Enum):
     PHONE = "phone"
     LAPTOP = "laptop"
     TABLET = "tablet"
-    ACCESSORIES = "accessories"
+    ACCESSORY = "accessory"
 
 
 class Product(Base, TimeStampMixin):

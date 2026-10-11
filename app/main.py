@@ -1,9 +1,12 @@
+from app.core.exceptions.handlers import register_exception_handlers
 from sqlalchemy import text
 from fastapi import Depends, FastAPI
 from app.core.config import Settings, get_settings
 from app.db.session import SessionDep, StreamingSessionDep
 
-app = FastAPI(title="Sales Agent")
+app = FastAPI(title=get_settings().APP_NAME)
+
+register_exception_handlers(app)
 
 
 @app.get("/health")
